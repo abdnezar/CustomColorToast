@@ -1,7 +1,6 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'maven-publish'
 }
 
 android {
@@ -33,13 +32,6 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    
-    publishing {
-        singleVariant('release') {
-            withSourcesJar()
-            withJavadocJar()
-        }
-    }
 }
 
 dependencies {
@@ -51,43 +43,23 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-                
-                groupId = 'com.github.abdnezar'
-                artifactId = 'colortoast-library'
-                version = '1.1.0'
-                
-                // Required by JitPack
-                pom {
-                    name = 'ColorToast'
-                    description = 'A simple Android library for creating custom colored toast messages in Kotlin'
-                    url = 'https://github.com/abdnezar/CustomColorToast'
-                    
-                    licenses {
-                        license {
-                            name = 'The Apache License, Version 2.0'
-                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        }
-                    }
-                    developers {
-                        developer {
-                            id = 'abdnezar'
-                            name = 'abdnezar'
-                        }
-                    }
-                }
-            }
-        }
-        
-        repositories {
-            maven {
-                name = 'jitpack'
-                url = 'https://jitpack.io'
-            }
-        }
-    }
+// JitPack configuration
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
 }
