@@ -9,3 +9,4 @@
 .externalNativeBuild
 .cxx
 local.properties
+gradle/wrapper/gradle-7.6-bin.zip
